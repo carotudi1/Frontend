@@ -7,7 +7,7 @@ export function getApiErrorMessage(error, fallback = 'Ocurrio un error. Intenta 
 
   if (data?.message) return data.message
   if (error?.code === 'ERR_NETWORK') {
-    return 'No se pudo conectar con la API. Revisa que el backend este encendido en http://localhost:8080.'
+    return 'No se pudo conectar con la API. Revisa que el backend este desplegado y que la URL configurada sea correcta.'
   }
 
   return fallback

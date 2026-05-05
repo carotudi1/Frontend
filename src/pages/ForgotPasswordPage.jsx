@@ -31,6 +31,15 @@ export default function ForgotPasswordPage() {
     }
   }
 
+  const getResetPath = (resetLink) => {
+    try {
+      const url = new URL(resetLink, window.location.origin)
+      return `${url.pathname}${url.search}`
+    } catch {
+      return '/reset-password'
+    }
+  }
+
   return (
     <main className="auth-page">
       <section className="auth-card">
@@ -47,7 +56,7 @@ export default function ForgotPasswordPage() {
             <div className="alert alert-success">
               <p>{response.message}</p>
               {response.resetLink && (
-                <Link to={new URL(response.resetLink).pathname + new URL(response.resetLink).search}>
+                <Link to={getResetPath(response.resetLink)}>
                   Abrir enlace de recuperacion
                 </Link>
               )}
