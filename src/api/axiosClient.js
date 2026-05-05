@@ -2,7 +2,7 @@ import axios from 'axios'
 
 const API_URL =
   import.meta.env.VITE_API_URL ||
-  'https://products-react-api-hzc6gzege9gtd8dq.centralus-01.azurewebsites.net'
+  'https://api-oamw.onrender.com'
 
 const axiosClient = axios.create({
   baseURL: API_URL,
