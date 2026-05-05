@@ -10,6 +10,7 @@ export default defineConfig({
   },
   preview: {
     host: true,
+    allowedHosts: ['frontend-gd76.onrender.com'],
     port: Number(process.env.PORT) || 4173,
   },
 })
