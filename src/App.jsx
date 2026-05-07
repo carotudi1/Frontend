@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import Navbar from './components/layout/Navbar'
 import Footer from './components/layout/Footer'
@@ -11,32 +12,51 @@ import ProductsPage from './pages/ProductsPage'
 import ProductDetailPage from './pages/ProductDetailPage'
 import ProductFormPage from './pages/ProductFormPage'
 import SetsPage from './pages/SetsPage'
-import { getCurrentUser } from './services/authServices'
+import { clearSession, getCurrentUser } from './services/authServices'
 
 function App() {
-  const user = getCurrentUser()
-  const showNavbar = user !== null
+  const [user, setUser] = useState(() => getCurrentUser())
+  const isAuthenticated = Boolean(user)
+
+  const handleLogin = (nextUser) => {
+    setUser(nextUser)
+  }
+
+  const handleLogout = () => {
+    clearSession()
+    setUser(null)
+  }
 
   return (
     <>
-      {showNavbar && <Navbar />}
+      {isAuthenticated && <Navbar user={user} onLogout={handleLogout} />}
       <div className="app-content">
         <Routes>
-          <Route path="/" element={<LoginPage />} />
-          <Route path="/login" element={<Navigate to="/" />} />
-          <Route path="/register" element={<RegisterPage />} />
+          <Route
+            path="/"
+            element={isAuthenticated ? <Navigate to="/products" replace /> : <LoginPage onLogin={handleLogin} />}
+          />
+          <Route
+            path="/login"
+            element={isAuthenticated ? <Navigate to="/products" replace /> : <LoginPage onLogin={handleLogin} />}
+          />
+          <Route path="/register" element={isAuthenticated ? <Navigate to="/products" replace /> : <RegisterPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
-          <Route path="/home" element={user ? <HomePage /> : <Navigate to="/" />} />
-          <Route path="/dashboard" element={user ? <DashboardPage /> : <Navigate to="/" />} />
-          <Route path="/products" element={user ? <ProductsPage /> : <Navigate to="/" />} />
-          <Route path="/products/new" element={user ? <ProductFormPage /> : <Navigate to="/" />} />
-          <Route path="/products/:id" element={user ? <ProductDetailPage /> : <Navigate to="/" />} />
-          <Route path="/products/:id/edit" element={user ? <ProductFormPage /> : <Navigate to="/" />} />
-          <Route path="/sets" element={user ? <SetsPage /> : <Navigate to="/" />} />
+          <Route path="/home" element={isAuthenticated ? <HomePage /> : <Navigate to="/" replace />} />
+          <Route
+            path="/dashboard"
+            element={isAuthenticated ? <DashboardPage onLogout={handleLogout} /> : <Navigate to="/" replace />}
+          />
+          <Route path="/products" element={isAuthenticated ? <ProductsPage /> : <Navigate to="/" replace />} />
+          <Route path="/products/new" element={isAuthenticated ? <ProductFormPage /> : <Navigate to="/" replace />} />
+          <Route path="/products/:id" element={isAuthenticated ? <ProductDetailPage /> : <Navigate to="/" replace />} />
+          <Route path="/products/:id/edit" element={isAuthenticated ? <ProductFormPage /> : <Navigate to="/" replace />} />
+          <Route path="/sets" element={isAuthenticated ? <SetsPage /> : <Navigate to="/" replace />} />
+          <Route path="*" element={<Navigate to={isAuthenticated ? '/products' : '/'} replace />} />
         </Routes>
       </div>
-      {showNavbar && <Footer />}
+      {isAuthenticated && <Footer />}
     </>
   )
 }

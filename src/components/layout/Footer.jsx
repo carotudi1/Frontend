@@ -13,10 +13,9 @@ const Footer = () => {
         </div>
         <div className="site-footer__content">
           <div className="site-footer__links">
-            <Link to="/">Inicio</Link>
+            <Link to="/home">Inicio</Link>
             <Link to="/products">Productos</Link>
-            <Link to="/login">Login</Link>
-            <Link to="/register">Registro</Link>
+            <Link to="/dashboard">Panel</Link>
           </div>
           <div className="site-footer__meta">
             <span>ADSO 3067454</span>

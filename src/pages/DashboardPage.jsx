@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { getCurrentUser, clearSession } from '../services/authServices'
+import { getCurrentUser } from '../services/authServices'
 
-export default function DashboardPage() {
+export default function DashboardPage({ onLogout }) {
   const navigate = useNavigate()
   const user = getCurrentUser()
   const [stats] = useState(() => ({
@@ -22,7 +22,7 @@ export default function DashboardPage() {
   }, [navigate, user])
 
   const handleLogout = () => {
-    clearSession()
+    onLogout()
     navigate('/login')
   }
 

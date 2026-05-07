@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { login, saveSession } from '../services/authServices'
 import { getApiErrorMessage } from '../utils/apiError'
 
-export default function LoginPage() {
+export default function LoginPage({ onLogin }) {
   const navigate = useNavigate()
   const location = useLocation()
   const [form, setForm] = useState({
@@ -48,6 +48,7 @@ export default function LoginPage() {
         password: form.password,
       })
       saveSession(res)
+      onLogin?.(res.user)
       navigate('/products')
     } catch (apiError) {
       setError(getApiErrorMessage(apiError, 'Credenciales invalidas.'))

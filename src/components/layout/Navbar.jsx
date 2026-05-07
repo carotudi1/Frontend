@@ -1,19 +1,15 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { clearSession, getCurrentUser } from '../../services/authServices'
 
 const navItems = [
-  { label: 'Inicio', to: '/' },
+  { label: 'Inicio', to: '/home' },
   { label: 'Productos', to: '/products' },
-  { label: 'Login', to: '/login' },
-  { label: 'Registro', to: '/register' },
 ]
 
-const Navbar = () => {
+const Navbar = ({ user, onLogout }) => {
   const navigate = useNavigate()
-  const user = getCurrentUser()
 
   const handleLogout = () => {
-    clearSession()
+    onLogout()
     navigate('/login')
   }
 
@@ -26,9 +22,7 @@ const Navbar = () => {
         </NavLink>
 
         <div className="site-menu" aria-label="Menu principal">
-          {navItems
-            .filter((item) => (user ? !['/login', '/register'].includes(item.to) : true))
-            .map((item) => (
+          {navItems.map((item) => (
             <NavLink
               className={({ isActive }) => (isActive ? 'site-menu__link is-active' : 'site-menu__link')}
               end={item.to === '/'}
