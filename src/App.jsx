@@ -12,11 +12,14 @@ import ProductsPage from './pages/ProductsPage'
 import ProductDetailPage from './pages/ProductDetailPage'
 import ProductFormPage from './pages/ProductFormPage'
 import SetsPage from './pages/SetsPage'
+import CartPage from './pages/CartPage'
 import { clearSession, getCurrentUser } from './services/authServices'
+import { isAdmin } from './utils/roles'
 
 function App() {
   const [user, setUser] = useState(() => getCurrentUser())
   const isAuthenticated = Boolean(user)
+  const canManageProducts = isAdmin(user)
 
   const handleLogin = (nextUser) => {
     setUser(nextUser)
@@ -34,11 +37,11 @@ function App() {
         <Routes>
           <Route
             path="/"
-            element={isAuthenticated ? <Navigate to="/products" replace /> : <LoginPage onLogin={handleLogin} />}
+            element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <LoginPage onLogin={handleLogin} />}
           />
           <Route
             path="/login"
-            element={isAuthenticated ? <Navigate to="/products" replace /> : <LoginPage onLogin={handleLogin} />}
+            element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <LoginPage onLogin={handleLogin} />}
           />
           <Route path="/register" element={isAuthenticated ? <Navigate to="/products" replace /> : <RegisterPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
@@ -48,12 +51,22 @@ function App() {
             path="/dashboard"
             element={isAuthenticated ? <DashboardPage onLogout={handleLogout} /> : <Navigate to="/" replace />}
           />
-          <Route path="/products" element={isAuthenticated ? <ProductsPage /> : <Navigate to="/" replace />} />
-          <Route path="/products/new" element={isAuthenticated ? <ProductFormPage /> : <Navigate to="/" replace />} />
-          <Route path="/products/:id" element={isAuthenticated ? <ProductDetailPage /> : <Navigate to="/" replace />} />
-          <Route path="/products/:id/edit" element={isAuthenticated ? <ProductFormPage /> : <Navigate to="/" replace />} />
-          <Route path="/sets" element={isAuthenticated ? <SetsPage /> : <Navigate to="/" replace />} />
-          <Route path="*" element={<Navigate to={isAuthenticated ? '/products' : '/'} replace />} />
+          <Route path="/products" element={isAuthenticated ? <ProductsPage user={user} /> : <Navigate to="/" replace />} />
+          <Route
+            path="/products/new"
+            element={canManageProducts ? <ProductFormPage /> : <Navigate to="/products" replace />}
+          />
+          <Route
+            path="/products/:id"
+            element={isAuthenticated ? <ProductDetailPage user={user} /> : <Navigate to="/" replace />}
+          />
+          <Route
+            path="/products/:id/edit"
+            element={canManageProducts ? <ProductFormPage /> : <Navigate to="/products" replace />}
+          />
+          <Route path="/cart" element={isAuthenticated ? <CartPage /> : <Navigate to="/" replace />} />
+          <Route path="/sets" element={canManageProducts ? <SetsPage /> : <Navigate to="/products" replace />} />
+          <Route path="*" element={<Navigate to={isAuthenticated ? '/dashboard' : '/'} replace />} />
         </Routes>
       </div>
       {isAuthenticated && <Footer />}

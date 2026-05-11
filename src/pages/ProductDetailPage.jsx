@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { getById } from '../services/productService'
+import { addToCart } from '../services/cartService'
 import { getApiErrorMessage } from '../utils/apiError'
+import { isAdmin } from '../utils/roles'
 
 const formatPrice = (value) =>
   new Intl.NumberFormat('es-CO', {
@@ -10,12 +12,14 @@ const formatPrice = (value) =>
     maximumFractionDigits: 0,
   }).format(Number(value || 0))
 
-const ProductDetailPage = () => {
+const ProductDetailPage = ({ user }) => {
   const { id } = useParams()
   const navigate = useNavigate()
   const [product, setProduct] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
+  const admin = isAdmin(user)
 
   useEffect(() => {
     getById(id)
@@ -46,6 +50,8 @@ const ProductDetailPage = () => {
           <p>{product.descripcion || 'Producto sin descripcion registrada.'}</p>
         </div>
 
+        {success && <div className="alert alert-success">{success}</div>}
+
         <div className="product-detail__summary">
           <span>Precio</span>
           <strong>{formatPrice(product.precio)}</strong>
@@ -57,9 +63,23 @@ const ProductDetailPage = () => {
           <Link className="btn btn-outline-primary" to="/products">
             Volver
           </Link>
-          <Link className="btn btn-primary" to={`/products/${product.id}/edit`}>
-            Editar producto
-          </Link>
+          {admin ? (
+            <Link className="btn btn-primary" to={`/products/${product.id}/edit`}>
+              Editar producto
+            </Link>
+          ) : (
+            <button
+              className="btn btn-primary"
+              disabled={Number(product.stock || 0) === 0}
+              onClick={() => {
+                addToCart(product)
+                setSuccess(`${product.nombre} agregado al carrito.`)
+              }}
+              type="button"
+            >
+              Agregar al carrito
+            </button>
+          )}
         </div>
       </section>
     </main>

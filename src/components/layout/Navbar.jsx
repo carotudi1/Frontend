@@ -1,12 +1,19 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-
-const navItems = [
-  { label: 'Inicio', to: '/home' },
-  { label: 'Productos', to: '/products' },
-]
+import { isAdmin } from '../../utils/roles'
 
 const Navbar = ({ user, onLogout }) => {
   const navigate = useNavigate()
+  const admin = isAdmin(user)
+  const navItems = admin
+    ? [
+        { label: 'Panel', to: '/dashboard' },
+        { label: 'Inventario', to: '/products' },
+        { label: 'Sets', to: '/sets' },
+      ]
+    : [
+        { label: 'Catalogo', to: '/products' },
+        { label: 'Carrito', to: '/cart' },
+      ]
 
   const handleLogout = () => {
     onLogout()
@@ -34,7 +41,9 @@ const Navbar = ({ user, onLogout }) => {
           ))}
           {user && (
             <>
-              <span className="site-menu__user">{user.name || user.email}</span>
+              <span className="site-menu__user">
+                {user.name || user.email} · {admin ? 'Administrador' : 'Cliente'}
+              </span>
               <button className="site-menu__button" onClick={handleLogout} type="button">
                 Salir
               </button>

@@ -655,6 +655,50 @@ body {
   font-size: 1.25rem;
 }
 
+.cart-panel {
+  display: grid;
+  gap: 16px;
+}
+
+.cart-list {
+  display: grid;
+  gap: 12px;
+}
+
+.cart-item,
+.cart-summary {
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid #dce7f7;
+  border-radius: 8px;
+  display: grid;
+  gap: 16px;
+  padding: 18px;
+}
+
+.cart-item {
+  grid-template-columns: minmax(0, 1fr) auto auto;
+}
+
+.cart-item h3 {
+  font-size: 1.05rem;
+  margin: 0 0 4px;
+}
+
+.cart-item p {
+  color: #526b90;
+  margin: 0 0 4px;
+}
+
+.cart-summary {
+  justify-items: start;
+}
+
+.cart-summary strong {
+  color: #0d6efd;
+  font-size: 1.5rem;
+}
+
 .site-footer {
   margin-top: 48px;
   background:

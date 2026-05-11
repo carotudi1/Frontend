@@ -2,24 +2,32 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import ProductForm from '../components/products/ProductForm'
 import { create, getById, update } from '../services/productService'
+import { getCurrentUser } from '../services/authServices'
 import { getApiErrorMessage } from '../utils/apiError'
+import { isAdmin } from '../utils/roles'
 
 function ProductFormPage() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const user = getCurrentUser()
   const [initialData, setInitialData] = useState(null)
   const [loading, setLoading] = useState(Boolean(id))
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
   useEffect(() => {
+    if (!isAdmin(user)) {
+      navigate('/products', { replace: true })
+      return
+    }
+
     if (!id) return
 
     getById(id)
       .then(setInitialData)
       .catch((apiError) => setError(getApiErrorMessage(apiError, 'No se encontro el producto.')))
       .finally(() => setLoading(false))
-  }, [id])
+  }, [id, navigate, user])
 
   const handleSubmit = async (data) => {
     setError('')

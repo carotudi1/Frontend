@@ -7,7 +7,7 @@ const formatPrice = (value) =>
     maximumFractionDigits: 0,
   }).format(Number(value || 0))
 
-const ProductCard = ({ product, onDelete }) => {
+const ProductCard = ({ product, isAdmin = false, onAddToCart, onDelete }) => {
   const navigate = useNavigate()
   const stock = Number(product.stock || 0)
 
@@ -32,12 +32,20 @@ const ProductCard = ({ product, onDelete }) => {
         <button className="btn btn-outline-primary" onClick={() => navigate(`/products/${product.id}`)}>
           Ver
         </button>
-        <button className="btn btn-primary" onClick={() => navigate(`/products/${product.id}/edit`)}>
-          Editar
-        </button>
-        {onDelete && (
-          <button className="btn btn-outline-danger" onClick={() => onDelete(product.id)}>
-            Eliminar
+        {isAdmin ? (
+          <>
+            <button className="btn btn-primary" onClick={() => navigate(`/products/${product.id}/edit`)}>
+              Editar
+            </button>
+            {onDelete && (
+              <button className="btn btn-outline-danger" onClick={() => onDelete(product.id)}>
+                Eliminar
+              </button>
+            )}
+          </>
+        ) : (
+          <button className="btn btn-primary" disabled={stock === 0} onClick={() => onAddToCart?.(product)}>
+            Agregar al carrito
           </button>
         )}
       </div>
