@@ -33,6 +33,15 @@ export const addToCart = (product) => {
   return nextCart
 }
 
+export const updateCartQuantity = (id, quantity) => {
+  const safeQuantity = Math.max(1, Number(quantity) || 1)
+  const nextCart = getCart().map((item) =>
+    item.id === id ? { ...item, quantity: safeQuantity } : item
+  )
+  saveCart(nextCart)
+  return nextCart
+}
+
 export const removeFromCart = (id) => {
   const nextCart = getCart().filter((item) => item.id !== id)
   saveCart(nextCart)

@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { clearCart, getCart, removeFromCart } from '../services/cartService'
+import { clearCart, getCart, removeFromCart, updateCartQuantity } from '../services/cartService'
 
 const formatPrice = (value) =>
   new Intl.NumberFormat('es-CO', {
@@ -18,6 +18,10 @@ const CartPage = () => {
 
   const handleRemove = (id) => {
     setItems(removeFromCart(id))
+  }
+
+  const handleQuantity = (item, nextQuantity) => {
+    setItems(updateCartQuantity(item.id, nextQuantity))
   }
 
   const handleClear = () => {
@@ -51,13 +55,44 @@ const CartPage = () => {
           <div className="cart-list">
             {items.map((item) => (
               <article className="cart-item" key={item.id}>
-                <div>
+                <div className="cart-item__info">
+                  <span className="cart-item__tag">Producto</span>
                   <h3>{item.nombre}</h3>
                   <p>{item.descripcion || 'Producto sin descripcion registrada.'}</p>
-                  <span>Cantidad: {item.quantity}</span>
                 </div>
-                <strong>{formatPrice(Number(item.precio || 0) * Number(item.quantity || 1))}</strong>
-                <button className="btn btn-outline-danger" onClick={() => handleRemove(item.id)} type="button">
+                <div className="cart-item__price">
+                  <span>Precio unitario</span>
+                  <strong>{formatPrice(item.precio)}</strong>
+                </div>
+                <div className="quantity-stepper" aria-label={`Cantidad de ${item.nombre}`}>
+                  <button
+                    aria-label="Disminuir cantidad"
+                    disabled={Number(item.quantity || 1) <= 1}
+                    onClick={() => handleQuantity(item, Number(item.quantity || 1) - 1)}
+                    type="button"
+                  >
+                    -
+                  </button>
+                  <input
+                    aria-label="Cantidad"
+                    min="1"
+                    onChange={(event) => handleQuantity(item, event.target.value)}
+                    type="number"
+                    value={item.quantity}
+                  />
+                  <button
+                    aria-label="Aumentar cantidad"
+                    onClick={() => handleQuantity(item, Number(item.quantity || 1) + 1)}
+                    type="button"
+                  >
+                    +
+                  </button>
+                </div>
+                <div className="cart-item__subtotal">
+                  <span>Subtotal</span>
+                  <strong>{formatPrice(Number(item.precio || 0) * Number(item.quantity || 1))}</strong>
+                </div>
+                <button className="cart-remove" onClick={() => handleRemove(item.id)} type="button">
                   Quitar
                 </button>
               </article>
@@ -65,11 +100,18 @@ const CartPage = () => {
           </div>
 
           <div className="cart-summary">
-            <span>Total estimado</span>
-            <strong>{formatPrice(total)}</strong>
-            <button className="btn btn-outline-danger" onClick={handleClear} type="button">
-              Vaciar carrito
-            </button>
+            <div>
+              <span>Total estimado</span>
+              <strong>{formatPrice(total)}</strong>
+            </div>
+            <div className="cart-summary__actions">
+              <Link className="btn btn-primary" to="/products">
+                Agregar mas productos
+              </Link>
+              <button className="btn btn-outline-danger" onClick={handleClear} type="button">
+                Vaciar carrito
+              </button>
+            </div>
           </div>
         </section>
       )}

@@ -12,7 +12,7 @@ const ProductCard = ({ product, isAdmin = false, onAddToCart, onDelete }) => {
   const stock = Number(product.stock || 0)
 
   return (
-    <article className="product-card">
+    <article className={isAdmin ? 'product-card product-card--admin' : 'product-card product-card--client'}>
       <div className="product-card__header">
         <span className={stock > 0 ? 'product-status' : 'product-status product-status--empty'}>
           {stock > 0 ? 'Disponible' : 'Sin stock'}
@@ -24,8 +24,18 @@ const ProductCard = ({ product, isAdmin = false, onAddToCart, onDelete }) => {
       <p>{product.descripcion || 'Producto sin descripcion registrada.'}</p>
 
       <div className="product-card__stock">
-        <span>Stock</span>
+        <span>{isAdmin ? 'Inventario' : 'Unidades disponibles'}</span>
         <strong>{stock}</strong>
+      </div>
+
+      <div className="product-card__note">
+        {isAdmin
+          ? stock <= 5
+            ? 'Revisar stock'
+            : 'Inventario estable'
+          : stock > 0
+            ? 'Listo para agregar'
+            : 'No disponible por ahora'}
       </div>
 
       <div className="product-card__actions">

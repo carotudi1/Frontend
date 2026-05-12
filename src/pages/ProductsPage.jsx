@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { getAll, remove } from '../services/productService'
-import { addToCart } from '../services/cartService'
+import { addToCart, getCart } from '../services/cartService'
 import ProductCard from '../components/products/ProductCard'
 import { getApiErrorMessage } from '../utils/apiError'
 import { isAdmin } from '../utils/roles'
@@ -12,6 +12,9 @@ const ProductPage = ({ user }) => {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [filter, setFilter] = useState('')
+  const [cartQuantity, setCartQuantity] = useState(() =>
+    getCart().reduce((sum, item) => sum + Number(item.quantity || 1), 0)
+  )
   const admin = isAdmin(user)
 
   useEffect(() => {
@@ -27,6 +30,14 @@ const ProductPage = ({ user }) => {
     )
   }, [filter, products])
 
+  const totalStock = useMemo(() => {
+    return products.reduce((sum, product) => sum + Number(product.stock || 0), 0)
+  }, [products])
+
+  const lowStockCount = useMemo(() => {
+    return products.filter((product) => Number(product.stock || 0) > 0 && Number(product.stock || 0) <= 5).length
+  }, [products])
+
   const handleDelete = async (id) => {
     const shouldDelete = confirm('Quieres eliminar este producto?')
     if (!shouldDelete) return
@@ -40,7 +51,8 @@ const ProductPage = ({ user }) => {
   }
 
   const handleAddToCart = (product) => {
-    addToCart(product)
+    const nextCart = addToCart(product)
+    setCartQuantity(nextCart.reduce((sum, item) => sum + Number(item.quantity || 1), 0))
     setSuccess(`${product.nombre} agregado al carrito.`)
   }
 
@@ -75,6 +87,40 @@ const ProductPage = ({ user }) => {
           value={filter}
         />
         <span>{filteredProducts.length} producto(s)</span>
+      </section>
+
+      <section className="role-summary" aria-label={admin ? 'Resumen de inventario' : 'Resumen del catalogo'}>
+        {admin ? (
+          <>
+            <article>
+              <span>Productos activos</span>
+              <strong>{products.length}</strong>
+            </article>
+            <article>
+              <span>Unidades en stock</span>
+              <strong>{totalStock}</strong>
+            </article>
+            <article>
+              <span>Stock bajo</span>
+              <strong>{lowStockCount}</strong>
+            </article>
+          </>
+        ) : (
+          <>
+            <article>
+              <span>Disponibles</span>
+              <strong>{products.filter((product) => Number(product.stock || 0) > 0).length}</strong>
+            </article>
+            <article>
+              <span>En tu carrito</span>
+              <strong>{cartQuantity}</strong>
+            </article>
+            <article>
+              <span>Resultados</span>
+              <strong>{filteredProducts.length}</strong>
+            </article>
+          </>
+        )}
       </section>
 
       {error && <div className="alert alert-danger">{error}</div>}
