@@ -13,6 +13,14 @@ const ProductCard = ({ product, isAdmin = false, onAddToCart, onDelete }) => {
 
   return (
     <article className={isAdmin ? 'product-card product-card--admin' : 'product-card product-card--client'}>
+      <button
+        className="product-card__image"
+        onClick={() => navigate(`/products/${product.id}`)}
+        type="button"
+      >
+        {product.imageUrl ? <img src={product.imageUrl} alt={product.nombre} /> : <span>Sin imagen</span>}
+      </button>
+
       <div className="product-card__header">
         <span className={stock > 0 ? 'product-status' : 'product-status product-status--empty'}>
           {stock > 0 ? 'Disponible' : 'Sin stock'}
@@ -55,7 +63,7 @@ const ProductCard = ({ product, isAdmin = false, onAddToCart, onDelete }) => {
           </>
         ) : (
           <button className="btn btn-primary" disabled={stock === 0} onClick={() => onAddToCart?.(product)}>
-            Agregar al carrito
+            Agregar
           </button>
         )}
       </div>

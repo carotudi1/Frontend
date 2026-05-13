@@ -6,8 +6,10 @@ export default function ProductForm({ initialData = {}, loading = false, onSubmi
     precio: initialData?.precio || '',
     descripcion: initialData?.descripcion || '',
     stock: initialData?.stock ?? '',
+    imageUrl: initialData?.imageUrl || '',
   })
   const [errors, setErrors] = useState({})
+  const imageComesFromFile = form.imageUrl.startsWith('data:image')
 
   const handleChange = (e) => {
     setForm({
@@ -15,6 +17,21 @@ export default function ProductForm({ initialData = {}, loading = false, onSubmi
       [e.target.name]: e.target.value,
     })
     setErrors({ ...errors, [e.target.name]: '' })
+  }
+
+  const handlePhotoChange = (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    const reader = new FileReader()
+    reader.onload = () => {
+      setForm((currentForm) => ({
+        ...currentForm,
+        imageUrl: reader.result,
+      }))
+      setErrors((currentErrors) => ({ ...currentErrors, imageUrl: '' }))
+    }
+    reader.readAsDataURL(file)
   }
 
   const validateForm = () => {
@@ -45,6 +62,7 @@ export default function ProductForm({ initialData = {}, loading = false, onSubmi
       descripcion: form.descripcion.trim(),
       precio: Number(form.precio),
       stock: Number(form.stock),
+      imageUrl: form.imageUrl,
     })
   }
 
@@ -103,6 +121,38 @@ export default function ProductForm({ initialData = {}, loading = false, onSubmi
         />
         {errors.descripcion && <small>{errors.descripcion}</small>}
       </label>
+
+      <section className="product-form__photo product-form__wide">
+        <div>
+          <span className="home-eyebrow">Foto del producto</span>
+          <h2>Imagen para el catalogo</h2>
+          <p>Sube una foto del uniforme o pega el enlace de una imagen.</p>
+        </div>
+
+        <label>
+          Subir foto
+          <input className="form-control" name="photoFile" type="file" accept="image/*" onChange={handlePhotoChange} />
+        </label>
+
+        <label>
+          Link de la foto
+          <input
+            className="form-control"
+            name="imageUrl"
+            placeholder="https://ejemplo.com/foto-producto.jpg"
+            value={imageComesFromFile ? '' : form.imageUrl}
+            onChange={handleChange}
+          />
+        </label>
+
+        <div className="product-form__preview">
+          {form.imageUrl ? (
+            <img src={form.imageUrl} alt="Vista previa del producto" />
+          ) : (
+            <span>Vista previa</span>
+          )}
+        </div>
+      </section>
 
       <button className="btn btn-primary btn-lg product-form__wide" disabled={loading} type="submit">
         {loading ? 'Guardando...' : submitLabel}

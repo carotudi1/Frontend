@@ -16,12 +16,12 @@ const CartPage = () => {
     return items.reduce((sum, item) => sum + Number(item.precio || 0) * Number(item.quantity || 1), 0)
   }, [items])
 
-  const handleRemove = (id) => {
-    setItems(removeFromCart(id))
+  const handleRemove = (item) => {
+    setItems(removeFromCart(item.id, item.selectedSize))
   }
 
   const handleQuantity = (item, nextQuantity) => {
-    setItems(updateCartQuantity(item.id, nextQuantity))
+    setItems(updateCartQuantity(item.id, nextQuantity, item.selectedSize))
   }
 
   const handleClear = () => {
@@ -54,11 +54,12 @@ const CartPage = () => {
         <section className="cart-panel">
           <div className="cart-list">
             {items.map((item) => (
-              <article className="cart-item" key={item.id}>
+              <article className="cart-item" key={`${item.id}-${item.selectedSize || 'M'}`}>
                 <div className="cart-item__info">
                   <span className="cart-item__tag">Producto</span>
                   <h3>{item.nombre}</h3>
                   <p>{item.descripcion || 'Producto sin descripcion registrada.'}</p>
+                  <strong className="cart-item__size">Talla {item.selectedSize || 'M'}</strong>
                 </div>
                 <div className="cart-item__price">
                   <span>Precio unitario</span>
@@ -92,7 +93,7 @@ const CartPage = () => {
                   <span>Subtotal</span>
                   <strong>{formatPrice(Number(item.precio || 0) * Number(item.quantity || 1))}</strong>
                 </div>
-                <button className="cart-remove" onClick={() => handleRemove(item.id)} type="button">
+                <button className="cart-remove" onClick={() => handleRemove(item)} type="button">
                   Quitar
                 </button>
               </article>

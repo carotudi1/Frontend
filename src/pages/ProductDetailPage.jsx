@@ -19,7 +19,9 @@ const ProductDetailPage = ({ user }) => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+  const [selectedSize, setSelectedSize] = useState('M')
   const admin = isAdmin(user)
+  const sizes = ['XS', 'S', 'M', 'L', 'XL']
 
   useEffect(() => {
     getById(id)
@@ -44,10 +46,16 @@ const ProductDetailPage = ({ user }) => {
   return (
     <main className="form-page">
       <section className="product-detail">
-        <div>
-          <span className="home-eyebrow">Detalle del producto</span>
-          <h1>{product.nombre}</h1>
-          <p>{product.descripcion || 'Producto sin descripcion registrada.'}</p>
+        <div className="product-detail__layout">
+          <div className="product-detail__image">
+            {product.imageUrl ? <img src={product.imageUrl} alt={product.nombre} /> : <span>Sin imagen</span>}
+          </div>
+
+          <div>
+            <span className="home-eyebrow">Detalle del producto</span>
+            <h1>{product.nombre}</h1>
+            <p>{product.descripcion || 'Producto sin descripcion registrada.'}</p>
+          </div>
         </div>
 
         {success && <div className="alert alert-success">{success}</div>}
@@ -58,6 +66,25 @@ const ProductDetailPage = ({ user }) => {
           <span>Stock disponible</span>
           <strong>{product.stock}</strong>
         </div>
+
+        {!admin && (
+          <div className="size-picker">
+            <span>Escoge tu talla</span>
+            <div className="size-picker__options" role="group" aria-label="Tallas disponibles">
+              {sizes.map((size) => (
+                <button
+                  className={selectedSize === size ? 'size-picker__option is-selected' : 'size-picker__option'}
+                  key={size}
+                  onClick={() => setSelectedSize(size)}
+                  type="button"
+                >
+                  {size}
+                </button>
+              ))}
+            </div>
+            <p>Talla seleccionada: {selectedSize}</p>
+          </div>
+        )}
 
         <div className="product-card__actions">
           <Link className="btn btn-outline-primary" to="/products">
@@ -72,8 +99,8 @@ const ProductDetailPage = ({ user }) => {
               className="btn btn-primary"
               disabled={Number(product.stock || 0) === 0}
               onClick={() => {
-                addToCart(product)
-                setSuccess(`${product.nombre} agregado al carrito.`)
+                addToCart({ ...product, selectedSize })
+                setSuccess(`${product.nombre} talla ${selectedSize} agregado al carrito.`)
               }}
               type="button"
             >

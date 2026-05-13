@@ -51,9 +51,9 @@ const ProductPage = ({ user }) => {
   }
 
   const handleAddToCart = (product) => {
-    const nextCart = addToCart(product)
+    const nextCart = addToCart({ ...product, selectedSize: 'M' })
     setCartQuantity(nextCart.reduce((sum, item) => sum + Number(item.quantity || 1), 0))
-    setSuccess(`${product.nombre} agregado al carrito.`)
+    setSuccess(`${product.nombre} talla M agregado al carrito.`)
   }
 
   return (
@@ -64,7 +64,7 @@ const ProductPage = ({ user }) => {
           <h1>{admin ? 'Inventario de productos' : 'Productos disponibles'}</h1>
           <p>
             {admin
-              ? 'Administra los uniformes, precios y cantidades disponibles para los aprendices.'
+              ? 'Administra uniformes, fotos, precios y cantidades disponibles para los aprendices.'
               : 'Consulta las caracteristicas de cada producto y agrega al carrito lo que necesitas.'}
           </p>
         </div>
