@@ -24,7 +24,7 @@ const getProductQuantityInCart = (cart, productId) => {
 
 export const addToCart = (product) => {
   const cart = getCart()
-  const selectedSize = product.selectedSize || 'M'
+  const selectedSize = product.selectedSize || 'Unica'
   const stock = Number(product.stock || 0)
   const currentProductQuantity = getProductQuantityInCart(cart, product.id)
 
@@ -36,11 +36,11 @@ export const addToCart = (product) => {
     }
   }
 
-  const existing = cart.find((item) => item.id === product.id && (item.selectedSize || 'M') === selectedSize)
+  const existing = cart.find((item) => item.id === product.id && (item.selectedSize || 'Unica') === selectedSize)
 
   if (existing) {
     const nextCart = cart.map((item) =>
-      item.id === product.id && (item.selectedSize || 'M') === selectedSize
+      item.id === product.id && (item.selectedSize || 'Unica') === selectedSize
         ? { ...item, quantity: item.quantity + 1 }
         : item
     )
@@ -61,25 +61,25 @@ export const addToCart = (product) => {
   }
 }
 
-export const updateCartQuantity = (id, quantity, selectedSize = 'M') => {
+export const updateCartQuantity = (id, quantity, selectedSize = 'Unica') => {
   const cart = getCart()
   const productItems = cart.filter((item) => item.id === id)
-  const targetItem = productItems.find((item) => (item.selectedSize || 'M') === selectedSize)
+  const targetItem = productItems.find((item) => (item.selectedSize || 'Unica') === selectedSize)
   const stock = Number(targetItem?.stock || 0)
   const quantityInOtherSizes = productItems
-    .filter((item) => (item.selectedSize || 'M') !== selectedSize)
+    .filter((item) => (item.selectedSize || 'Unica') !== selectedSize)
     .reduce((sum, item) => sum + Number(item.quantity || 1), 0)
   const maxForSelectedSize = Math.max(1, stock - quantityInOtherSizes)
   const safeQuantity = Math.min(maxForSelectedSize, Math.max(1, Number(quantity) || 1))
   const nextCart = cart.map((item) =>
-    item.id === id && (item.selectedSize || 'M') === selectedSize ? { ...item, quantity: safeQuantity } : item
+    item.id === id && (item.selectedSize || 'Unica') === selectedSize ? { ...item, quantity: safeQuantity } : item
   )
   saveCart(nextCart)
   return nextCart
 }
 
-export const removeFromCart = (id, selectedSize = 'M') => {
-  const nextCart = getCart().filter((item) => !(item.id === id && (item.selectedSize || 'M') === selectedSize))
+export const removeFromCart = (id, selectedSize = 'Unica') => {
+  const nextCart = getCart().filter((item) => !(item.id === id && (item.selectedSize || 'Unica') === selectedSize))
   saveCart(nextCart)
   return nextCart
 }

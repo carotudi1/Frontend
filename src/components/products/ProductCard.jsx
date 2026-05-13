@@ -11,8 +11,8 @@ const formatPrice = (value) =>
 const ProductCard = ({ product, isAdmin = false, onAddToCart, onDelete }) => {
   const navigate = useNavigate()
   const stock = Number(product.stock || 0)
-  const sizes = ['XS', 'S', 'M', 'L', 'XL']
-  const [selectedSize, setSelectedSize] = useState('M')
+  const sizes = product.tallasDisponibles?.length ? product.tallasDisponibles : ['Unica']
+  const [selectedSize, setSelectedSize] = useState(sizes[0])
 
   return (
     <article className={isAdmin ? 'product-card product-card--admin' : 'product-card product-card--client'}>
@@ -38,6 +38,15 @@ const ProductCard = ({ product, isAdmin = false, onAddToCart, onDelete }) => {
         <span>{isAdmin ? 'Inventario' : 'Unidades disponibles'}</span>
         <strong>{stock}</strong>
       </div>
+
+      {sizes.length > 0 && (
+        <div className="product-card__sizes" aria-label="Tallas disponibles">
+          {sizes.slice(0, 5).map((size) => (
+            <span key={size}>{size}</span>
+          ))}
+          {sizes.length > 5 && <span>+{sizes.length - 5}</span>}
+        </div>
+      )}
 
       {!isAdmin && (
         <label className="product-card__size">

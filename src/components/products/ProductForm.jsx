@@ -7,6 +7,7 @@ export default function ProductForm({ initialData = {}, loading = false, onSubmi
     descripcion: initialData?.descripcion || '',
     stock: initialData?.stock ?? '',
     imageUrl: initialData?.imageUrl || '',
+    tallasText: initialData?.tallasDisponibles?.join(', ') || '',
   })
   const [errors, setErrors] = useState({})
 
@@ -73,6 +74,9 @@ export default function ProductForm({ initialData = {}, loading = false, onSubmi
     if (form.stock === '' || Number(form.stock) < 0 || !Number.isInteger(Number(form.stock))) {
       nextErrors.stock = 'El stock debe ser un numero entero positivo.'
     }
+    if (form.tallasText.length > 300) {
+      nextErrors.tallasText = 'La lista de tallas es demasiado larga.'
+    }
 
     setErrors(nextErrors)
     return Object.keys(nextErrors).length === 0
@@ -82,12 +86,18 @@ export default function ProductForm({ initialData = {}, loading = false, onSubmi
     e.preventDefault()
     if (!validateForm()) return
 
+    const tallasDisponibles = form.tallasText
+      .split(',')
+      .map((talla) => talla.trim())
+      .filter(Boolean)
+
     onSubmit({
       nombre: form.nombre.trim(),
       descripcion: form.descripcion.trim(),
       precio: Number(form.precio),
       stock: Number(form.stock),
       imageUrl: form.imageUrl,
+      tallasDisponibles,
     })
   }
 
@@ -145,6 +155,19 @@ export default function ProductForm({ initialData = {}, loading = false, onSubmi
           onChange={handleChange}
         />
         {errors.descripcion && <small>{errors.descripcion}</small>}
+      </label>
+
+      <label className="product-form__wide">
+        Tallas disponibles
+        <input
+          className={`form-control ${errors.tallasText ? 'is-invalid' : ''}`}
+          name="tallasText"
+          placeholder="Ej: XS, S, M, L, XL o 38, 39, 40"
+          value={form.tallasText}
+          onChange={handleChange}
+        />
+        <span className="form-help">Separa cada talla con una coma.</span>
+        {errors.tallasText && <small>{errors.tallasText}</small>}
       </label>
 
       <section className="product-form__photo product-form__wide">

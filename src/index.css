@@ -435,6 +435,12 @@ body {
   font-weight: 650;
 }
 
+.form-help {
+  color: #526b90;
+  font-size: 0.9rem;
+  font-weight: 650;
+}
+
 .auth-form .form-control,
 .product-form .form-control,
 .toolbar-panel .form-control {
@@ -652,6 +658,25 @@ body {
 
 .product-card__stock strong {
   color: #10243f;
+}
+
+.product-card__sizes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 18px 14px;
+}
+
+.product-card__sizes span {
+  min-width: 34px;
+  padding: 5px 8px;
+  border: 1px solid #d7e5ff;
+  border-radius: 8px;
+  background: #eef5ff;
+  color: #0b5ed7;
+  font-size: 0.82rem;
+  font-weight: 900;
+  text-align: center;
 }
 
 .product-card__size {
@@ -875,6 +900,20 @@ body {
   border-color: #0d6efd;
   background: #0d6efd;
   color: #ffffff;
+}
+
+.cart-button-count {
+  display: inline-grid;
+  min-width: 26px;
+  min-height: 26px;
+  margin-left: 8px;
+  place-items: center;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #0d6efd;
+  font-size: 0.85rem;
+  font-weight: 900;
 }
 
 .cart-panel {

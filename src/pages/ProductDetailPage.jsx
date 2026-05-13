@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { getById } from '../services/productService'
-import { addToCart } from '../services/cartService'
+import { addToCart, getCart } from '../services/cartService'
 import { getApiErrorMessage } from '../utils/apiError'
 import { isAdmin } from '../utils/roles'
 
@@ -20,16 +20,30 @@ const ProductDetailPage = ({ user }) => {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [cartError, setCartError] = useState('')
-  const [selectedSize, setSelectedSize] = useState('M')
+  const [selectedSize, setSelectedSize] = useState('')
+  const [addedCount, setAddedCount] = useState(0)
   const admin = isAdmin(user)
-  const sizes = ['XS', 'S', 'M', 'L', 'XL']
+  const sizes = product?.tallasDisponibles?.length ? product.tallasDisponibles : ['Unica']
 
   useEffect(() => {
     getById(id)
-      .then(setProduct)
+      .then((data) => {
+        const availableSizes = data?.tallasDisponibles?.length ? data.tallasDisponibles : ['Unica']
+        setProduct(data)
+        setSelectedSize(availableSizes[0])
+      })
       .catch((apiError) => setError(getApiErrorMessage(apiError, 'Producto no encontrado.')))
       .finally(() => setLoading(false))
   }, [id])
+
+  useEffect(() => {
+    if (!product || !selectedSize) return
+
+    const item = getCart().find(
+      (cartItem) => cartItem.id === product.id && (cartItem.selectedSize || 'Unica') === selectedSize
+    )
+    setAddedCount(item?.quantity || 0)
+  }, [product, selectedSize])
 
   if (loading) return <div className="catalog-message">Cargando producto...</div>
 
@@ -104,10 +118,17 @@ const ProductDetailPage = ({ user }) => {
                 const result = addToCart({ ...product, selectedSize })
                 setSuccess(result.added ? result.message : '')
                 setCartError(result.added ? '' : result.message)
+                if (result.added) {
+                  const item = result.cart.find(
+                    (cartItem) => cartItem.id === product.id && (cartItem.selectedSize || 'Unica') === selectedSize
+                  )
+                  setAddedCount(item?.quantity || 0)
+                }
               }}
               type="button"
             >
               Agregar al carrito
+              {addedCount > 0 && <span className="cart-button-count">{addedCount}</span>}
             </button>
           )}
         </div>
