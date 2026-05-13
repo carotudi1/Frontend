@@ -9,7 +9,6 @@ export default function ProductForm({ initialData = {}, loading = false, onSubmi
     imageUrl: initialData?.imageUrl || '',
   })
   const [errors, setErrors] = useState({})
-  const imageComesFromFile = form.imageUrl.startsWith('data:image')
 
   const handleChange = (e) => {
     setForm({
@@ -17,21 +16,6 @@ export default function ProductForm({ initialData = {}, loading = false, onSubmi
       [e.target.name]: e.target.value,
     })
     setErrors({ ...errors, [e.target.name]: '' })
-  }
-
-  const handlePhotoChange = (e) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-
-    const reader = new FileReader()
-    reader.onload = () => {
-      setForm((currentForm) => ({
-        ...currentForm,
-        imageUrl: reader.result,
-      }))
-      setErrors((currentErrors) => ({ ...currentErrors, imageUrl: '' }))
-    }
-    reader.readAsDataURL(file)
   }
 
   const validateForm = () => {
@@ -47,6 +31,9 @@ export default function ProductForm({ initialData = {}, loading = false, onSubmi
     }
     if (form.stock === '' || Number(form.stock) < 0 || !Number.isInteger(Number(form.stock))) {
       nextErrors.stock = 'El stock debe ser un numero entero positivo.'
+    }
+    if (form.imageUrl.trim().length > 1000) {
+      nextErrors.imageUrl = 'Usa un enlace de imagen. El servidor no acepta fotos subidas directamente.'
     }
 
     setErrors(nextErrors)
@@ -126,23 +113,19 @@ export default function ProductForm({ initialData = {}, loading = false, onSubmi
         <div>
           <span className="home-eyebrow">Foto del producto</span>
           <h2>Imagen para el catalogo</h2>
-          <p>Sube una foto del uniforme o pega el enlace de una imagen.</p>
+          <p>Pega el enlace de una imagen para que el servidor pueda guardarla correctamente.</p>
         </div>
-
-        <label>
-          Subir foto
-          <input className="form-control" name="photoFile" type="file" accept="image/*" onChange={handlePhotoChange} />
-        </label>
 
         <label>
           Link de la foto
           <input
-            className="form-control"
+            className={`form-control ${errors.imageUrl ? 'is-invalid' : ''}`}
             name="imageUrl"
             placeholder="https://ejemplo.com/foto-producto.jpg"
-            value={imageComesFromFile ? '' : form.imageUrl}
+            value={form.imageUrl}
             onChange={handleChange}
           />
+          {errors.imageUrl && <small>{errors.imageUrl}</small>}
         </label>
 
         <div className="product-form__preview">
