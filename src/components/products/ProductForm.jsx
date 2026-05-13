@@ -16,7 +16,7 @@ export default function ProductForm({ initialData = {}, loading = false, onSubmi
       reader.onload = () => {
         const image = new Image()
         image.onload = () => {
-          const maxSize = 900
+          const maxSize = 640
           const scale = Math.min(1, maxSize / Math.max(image.width, image.height))
           const canvas = document.createElement('canvas')
           canvas.width = Math.round(image.width * scale)
@@ -24,7 +24,7 @@ export default function ProductForm({ initialData = {}, loading = false, onSubmi
 
           const context = canvas.getContext('2d')
           context.drawImage(image, 0, 0, canvas.width, canvas.height)
-          resolve(canvas.toDataURL('image/jpeg', 0.82))
+          resolve(canvas.toDataURL('image/jpeg', 0.72))
         }
         image.onerror = reject
         image.src = reader.result
