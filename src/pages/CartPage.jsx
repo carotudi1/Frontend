@@ -16,6 +16,12 @@ const CartPage = () => {
     return items.reduce((sum, item) => sum + Number(item.precio || 0) * Number(item.quantity || 1), 0)
   }, [items])
 
+  const getProductQuantityInCart = (productId) => {
+    return items
+      .filter((item) => item.id === productId)
+      .reduce((sum, item) => sum + Number(item.quantity || 1), 0)
+  }
+
   const handleRemove = (item) => {
     setItems(removeFromCart(item.id, item.selectedSize))
   }
@@ -60,6 +66,9 @@ const CartPage = () => {
                   <h3>{item.nombre}</h3>
                   <p>{item.descripcion || 'Producto sin descripcion registrada.'}</p>
                   <strong className="cart-item__size">Talla {item.selectedSize || 'M'}</strong>
+                  <span className="cart-item__available">
+                    Disponibles: {Number(item.stock || 0)} | En carrito: {getProductQuantityInCart(item.id)}
+                  </span>
                 </div>
                 <div className="cart-item__price">
                   <span>Precio unitario</span>
@@ -76,6 +85,7 @@ const CartPage = () => {
                   </button>
                   <input
                     aria-label="Cantidad"
+                    max={Number(item.stock || 0)}
                     min="1"
                     onChange={(event) => handleQuantity(item, event.target.value)}
                     type="number"
@@ -83,6 +93,7 @@ const CartPage = () => {
                   />
                   <button
                     aria-label="Aumentar cantidad"
+                    disabled={getProductQuantityInCart(item.id) >= Number(item.stock || 0)}
                     onClick={() => handleQuantity(item, Number(item.quantity || 1) + 1)}
                     type="button"
                   >

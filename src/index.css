@@ -654,6 +654,24 @@ body {
   color: #10243f;
 }
 
+.product-card__size {
+  display: grid;
+  gap: 8px;
+  margin: 0 18px 14px;
+  color: #1d3557;
+  font-weight: 800;
+}
+
+.product-card__size select {
+  min-height: 42px;
+  padding: 0 12px;
+  border: 1px solid #b8d2ff;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #10243f;
+  font-weight: 800;
+}
+
 .product-card__note {
   margin: 0 18px 16px;
   padding: 8px 10px;
@@ -923,6 +941,14 @@ body {
   background: #eef5ff;
   color: #0b5ed7;
   font-size: 0.85rem;
+}
+
+.cart-item__available {
+  display: block;
+  margin-top: 8px;
+  color: #526b90;
+  font-size: 0.86rem;
+  font-weight: 800;
 }
 
 .quantity-stepper {

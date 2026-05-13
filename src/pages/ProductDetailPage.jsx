@@ -19,6 +19,7 @@ const ProductDetailPage = ({ user }) => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+  const [cartError, setCartError] = useState('')
   const [selectedSize, setSelectedSize] = useState('M')
   const admin = isAdmin(user)
   const sizes = ['XS', 'S', 'M', 'L', 'XL']
@@ -59,6 +60,7 @@ const ProductDetailPage = ({ user }) => {
         </div>
 
         {success && <div className="alert alert-success">{success}</div>}
+        {cartError && <div className="alert alert-danger">{cartError}</div>}
 
         <div className="product-detail__summary">
           <span>Precio</span>
@@ -99,8 +101,9 @@ const ProductDetailPage = ({ user }) => {
               className="btn btn-primary"
               disabled={Number(product.stock || 0) === 0}
               onClick={() => {
-                addToCart({ ...product, selectedSize })
-                setSuccess(`${product.nombre} talla ${selectedSize} agregado al carrito.`)
+                const result = addToCart({ ...product, selectedSize })
+                setSuccess(result.added ? result.message : '')
+                setCartError(result.added ? '' : result.message)
               }}
               type="button"
             >

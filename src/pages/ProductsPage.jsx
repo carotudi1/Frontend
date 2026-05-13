@@ -51,9 +51,10 @@ const ProductPage = ({ user }) => {
   }
 
   const handleAddToCart = (product) => {
-    const nextCart = addToCart({ ...product, selectedSize: 'M' })
-    setCartQuantity(nextCart.reduce((sum, item) => sum + Number(item.quantity || 1), 0))
-    setSuccess(`${product.nombre} talla M agregado al carrito.`)
+    const result = addToCart(product)
+    setCartQuantity(result.cart.reduce((sum, item) => sum + Number(item.quantity || 1), 0))
+    setSuccess(result.added ? result.message : '')
+    setError(result.added ? '' : result.message)
   }
 
   return (

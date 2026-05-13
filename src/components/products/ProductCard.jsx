@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 const formatPrice = (value) =>
@@ -10,6 +11,8 @@ const formatPrice = (value) =>
 const ProductCard = ({ product, isAdmin = false, onAddToCart, onDelete }) => {
   const navigate = useNavigate()
   const stock = Number(product.stock || 0)
+  const sizes = ['XS', 'S', 'M', 'L', 'XL']
+  const [selectedSize, setSelectedSize] = useState('M')
 
   return (
     <article className={isAdmin ? 'product-card product-card--admin' : 'product-card product-card--client'}>
@@ -35,6 +38,19 @@ const ProductCard = ({ product, isAdmin = false, onAddToCart, onDelete }) => {
         <span>{isAdmin ? 'Inventario' : 'Unidades disponibles'}</span>
         <strong>{stock}</strong>
       </div>
+
+      {!isAdmin && (
+        <label className="product-card__size">
+          Talla a comprar
+          <select value={selectedSize} onChange={(event) => setSelectedSize(event.target.value)}>
+            {sizes.map((size) => (
+              <option key={size} value={size}>
+                {size}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
 
       <div className="product-card__note">
         {isAdmin
@@ -62,7 +78,11 @@ const ProductCard = ({ product, isAdmin = false, onAddToCart, onDelete }) => {
             )}
           </>
         ) : (
-          <button className="btn btn-primary" disabled={stock === 0} onClick={() => onAddToCart?.(product)}>
+          <button
+            className="btn btn-primary"
+            disabled={stock === 0}
+            onClick={() => onAddToCart?.({ ...product, selectedSize })}
+          >
             Agregar
           </button>
         )}

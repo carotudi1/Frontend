@@ -16,9 +16,26 @@ export const saveCart = (cart) => {
   localStorage.setItem(CART_KEY, JSON.stringify(cart))
 }
 
+const getProductQuantityInCart = (cart, productId) => {
+  return cart
+    .filter((item) => item.id === productId)
+    .reduce((sum, item) => sum + Number(item.quantity || 1), 0)
+}
+
 export const addToCart = (product) => {
   const cart = getCart()
   const selectedSize = product.selectedSize || 'M'
+  const stock = Number(product.stock || 0)
+  const currentProductQuantity = getProductQuantityInCart(cart, product.id)
+
+  if (stock <= 0 || currentProductQuantity >= stock) {
+    return {
+      cart,
+      added: false,
+      message: `No hay mas unidades disponibles de ${product.nombre}. Stock disponible: ${stock}.`,
+    }
+  }
+
   const existing = cart.find((item) => item.id === product.id && (item.selectedSize || 'M') === selectedSize)
 
   if (existing) {
@@ -28,17 +45,33 @@ export const addToCart = (product) => {
         : item
     )
     saveCart(nextCart)
-    return nextCart
+    return {
+      cart: nextCart,
+      added: true,
+      message: `${product.nombre} talla ${selectedSize} agregado al carrito.`,
+    }
   }
 
   const nextCart = [...cart, { ...product, selectedSize, quantity: 1 }]
   saveCart(nextCart)
-  return nextCart
+  return {
+    cart: nextCart,
+    added: true,
+    message: `${product.nombre} talla ${selectedSize} agregado al carrito.`,
+  }
 }
 
 export const updateCartQuantity = (id, quantity, selectedSize = 'M') => {
-  const safeQuantity = Math.max(1, Number(quantity) || 1)
-  const nextCart = getCart().map((item) =>
+  const cart = getCart()
+  const productItems = cart.filter((item) => item.id === id)
+  const targetItem = productItems.find((item) => (item.selectedSize || 'M') === selectedSize)
+  const stock = Number(targetItem?.stock || 0)
+  const quantityInOtherSizes = productItems
+    .filter((item) => (item.selectedSize || 'M') !== selectedSize)
+    .reduce((sum, item) => sum + Number(item.quantity || 1), 0)
+  const maxForSelectedSize = Math.max(1, stock - quantityInOtherSizes)
+  const safeQuantity = Math.min(maxForSelectedSize, Math.max(1, Number(quantity) || 1))
+  const nextCart = cart.map((item) =>
     item.id === id && (item.selectedSize || 'M') === selectedSize ? { ...item, quantity: safeQuantity } : item
   )
   saveCart(nextCart)
